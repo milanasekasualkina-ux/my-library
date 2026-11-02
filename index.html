@@ -110,6 +110,9 @@
  .random-panel{padding:15px}
 }
 
+ .series-order-number{color:#d7a6dd;font-weight:700;font-variant-numeric:tabular-nums}
+.nav{scrollbar-width:thin}
+.shelf-accordion .book-list-row{min-height:54px}
 </style></head><body><header><div class="wrap"><div class="top"><div class="brand">✦ Моя библиотека<small>Истории, которые выбираю я</small></div><button class="btn" onclick="openEditor()">＋ Книга</button></div><nav class="nav" id="nav"><button class="active" data-tab="home">Главная</button><button data-tab="books">📚 К чтению</button><button data-tab="archive">✅ Архив</button><button data-tab="series">Циклы</button><button data-tab="authors">Авторы</button><button data-tab="random">🎲 Рандомайзер</button><button data-tab="stats">Статистика</button><button data-tab="settings">Данные</button></nav></div></header><main class="wrap">
 <section id="home" class="section active"><div class="hero"><div><div class="eyebrow">Твоя книжная вселенная</div><h1>Следующая история<br>ждёт тебя</h1><p>Сохраняй книги, собирай циклы, отмечай прочитанное и выбирай, что читать дальше.</p><button class="btn" onclick="showTab('random')">🎲 Выбрать книгу</button></div><div class="orn">📖</div></div><div id="readingCounter" class="reading-counter" aria-live="polite"></div><div id="homeStats" class="stats"></div><div class="shelf-title"><h2>📚 Следующие книги</h2><button class="btn secondary" onclick="showTab('books')">Вся полка →</button></div><div id="homeBooks" class="grid"></div></section>
 <section id="books" class="section"><h2>📚 К чтению</h2><p class="muted">Нажми на квадратик рядом с книгой, чтобы отправить её в архив.</p><div class="toolbar"><input id="search" class="field" placeholder="Название, автор, персонажи, цикл..." oninput="renderBooks()"><select id="sort" class="field" onchange="renderBooks()"><option value="title">По названию</option><option value="author">По автору</option><option value="series">По циклам</option><option value="new">Сначала добавленные</option></select></div><div id="filterChips" class="chips"></div><p class="hint" id="bookCount"></p><div id="bookGrid" class="grid"></div></section>
@@ -238,7 +241,12 @@ function makeAccordion(groupKey,title,subtitle,booksInGroup,expandedSet,mode,for
   const content=document.createElement('div');
   content.className='accordion-content';
   if(mode==='series'){
-    sortBooksInSeries(booksInGroup).forEach(b=>content.append(bookCard(b,{showAuthor:false,showSeries:false})));
+    sortBooksInSeries(booksInGroup).forEach((b,i)=>{
+      const row=bookCard(b,{showAuthor:false,showSeries:false});
+      const title=row.querySelector('.book-row-title');
+      if(title){const num=document.createElement('span');num.className='series-order-number';num.textContent=(Number(b.order)>0?Number(b.order):i+1)+'. ';title.prepend(num)}
+      content.append(row);
+    });
   }else{
     // Сначала книги по циклам (в правильном порядке), затем отдельные произведения.
     const bySeries=new Map();
